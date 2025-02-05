@@ -1,7 +1,8 @@
 package io.dodn.demo.messagequeue.config;
 
 
-import io.dodn.demo.messagequeue.Receiver;
+import io.dodn.demo.messagequeue.WorkQueueConsumer;
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -13,11 +14,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
     
-    public static final String QUEUE_NAME = "helloQueue";
+    public static final String QUEUE_NAME = "WorkerQueue";
     
     @Bean
     public Queue queue() {
-        return new Queue(QUEUE_NAME, false); // durable이 true이면 서버 껐다 켰을 때 큐 메세지 사라지지 않음
+        return new Queue(QUEUE_NAME, true); // durable이 true이면 서버 껐다 켰을 때 큐 메세지 사라지지 않음
     }
     
     // RabbitMQ와의 메시지 송수신을 단순화하고 관리하는 주요 객체
@@ -40,6 +41,7 @@ public class RabbitMQConfig {
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(QUEUE_NAME);
         container.setMessageListener(listenerAdapter);
+        container.setAcknowledgeMode(AcknowledgeMode.AUTO);
         return container;
     }
     
@@ -51,7 +53,7 @@ public class RabbitMQConfig {
     리스너 객체와 메시지를 처리할 메서드를 연결하는 다리 역할을 합니다.
     Receiver 클래스에서 **receiveMessage**와 같은 메서드를 지정하여, 해당 메서드에서 메시지를 처리하게 합니다.*/
     @Bean
-    public MessageListenerAdapter listenerAdapter(Receiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveMessage");
+        public MessageListenerAdapter listenerAdapter(WorkQueueConsumer workQueueTask) {
+        return new MessageListenerAdapter(workQueueTask, "receiveMessage");
     }
 }

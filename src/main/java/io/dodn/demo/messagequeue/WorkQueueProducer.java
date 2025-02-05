@@ -7,11 +7,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class Sender {
+public class WorkQueueProducer {
     
     private final RabbitTemplate rabbitTemplate;
     
-    public void send(String message) {
+    public void sendWorkQueue(String workQueueMessage, int duration) {
+        String message = workQueueMessage + "|" + duration;
         rabbitTemplate.convertAndSend(RabbitMQConfig.QUEUE_NAME, message);
         System.out.println("Sent <" + message + ">");
     }

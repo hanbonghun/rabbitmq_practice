@@ -2,20 +2,20 @@ package io.dodn.demo.messagequeue;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
-public class MessageController {
+public class WorkQueueController {
     
-    private final Sender sender;
+    private final WorkQueueProducer workQueueProducer;
     
     @PostMapping
-    public String sendMessage(@RequestBody String message) {
-        sender.send(message);
+    public String sendMessage(@RequestParam String message, @RequestParam int duration) {
+        workQueueProducer.sendWorkQueue(message, duration);
         return "Message sent" + message;
     }
     
